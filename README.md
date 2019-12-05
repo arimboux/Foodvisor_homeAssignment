@@ -48,8 +48,11 @@ python main.py --eval
 [config.py](https://github.com/arimboux/Foodvisor_homeAssignment/blob/master/config.py) file (EVAL_IMGS).
 
 # Results
+[accuracy]: https://github.com/arimboux/Foodvisor_homeAssignment/blob/master/static/images/accuracy.png
+[loss]: https://github.com/arimboux/Foodvisor_homeAssignment/blob/master/static/images/loss.png
 
 # Credits
 
 https://www.tensorflow.org/tensorboard/get_started
+
 https://www.kaggle.com/nabanitaroy/cnn-binary-classification-model/notebook

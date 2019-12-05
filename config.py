@@ -12,6 +12,11 @@ EPOCHS = 40
 BATCH_SIZE = 16
 LR = 10e-4
 IMG_SIZE = 600
+
+#OVERSAMPLE is used to cope with the unbalanced dataset but does not necessarily produce a better error rate on an eval set.
+#However, it tends to predict more false positive (image without tomatoes labeled as True) and less false negative which
+#is a better outcome when trying to warn about potentially dangerous food
+
 OVERSAMPLE = True
 
 EVAL_IMGS = ['1dc879c960bbf936557a4162bd39df41.jpeg',
