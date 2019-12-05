@@ -20,7 +20,8 @@ CKPT_PATH = r'D:\Foodvisor\ckpt\model\model'
 LOG_PATH = r'D:\Foodvisor\logs\model'
 ```
 
-CKPT_PATH is the path to the model checkpoint that can be found in the release.
+CKPT_PATH is the path to the model checkpoint that can be found [here](https://github.com/arimboux/Foodvisor_homeAssignment/tree/master/ckpt)
+(file is too big for a release).
 
 LOG_PATH is used to store the log provided during training for a TensorBoard monitoring. 
 If this directory doesn't exist it will be created in the main script.
