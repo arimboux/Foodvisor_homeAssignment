@@ -3,12 +3,12 @@ import os
 from utils import contains_tomato, split_dataset, decode_img, augment_img
 import numpy as np
 import matplotlib.pyplot as plt
-import random
 
 import tensorflow as tf
 from tensorflow.python.keras.layers import Dense, Flatten, Conv2D, MaxPooling2D, Dropout
 from tensorflow.python.keras import Model, backend
 from tensorflow.python.keras.callbacks import TensorBoard
+from sklearn.utils import class_weight
 
 
 class TomatoDectector(Model):
@@ -64,13 +64,12 @@ def train():
     xtrain, ytrain, xval, yval = split_dataset(bin_dict, IMGS_PATH)
 
     # Info about train and test set
-    print('Train set contains', len(ytrain), 'img and', ytrain.count(True), 'contain tomatoes')
-    print('Val set contains', len(yval), 'img and', yval.count(True), 'contain tomatoes')
+    print(f'Train set contains {len(ytrain)} img and {ytrain.count(True)} contain tomatoes')
+    print(f'Val set contains {len(yval)} img and {yval.count(True)} contain tomatoes')
 
-    # Class weights because of unbalanced data
-    weight_for_0 = (1 / (ytrain.count(False) + yval.count(False))) * (len(ytrain) + len(yval)) / 2.0
-    weight_for_1 = (1 / (ytrain.count(True) + yval.count(True))) * (len(ytrain) + len(yval)) / 2.0
-    class_weight = {0: weight_for_0, 1: weight_for_1}
+    # Class weights because of unbalanced data (relevant when OVERSAMPLE is False)
+    class_weights = class_weight.compute_class_weight('balanced', np.unique(ytrain + yval), ytrain + yval)
+    print(class_weights)
 
     file_ds_train = tf.data.Dataset.from_tensor_slices((xtrain, ytrain)).repeat()
     file_ds_val = tf.data.Dataset.from_tensor_slices((xval, yval))
@@ -86,7 +85,7 @@ def train():
 
     #Callbacks
     tensorboard_cbk = CustomTensorBoard(log_dir=LOG_PATH)
-    cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=CKPT_PATH, verbose=1, save_weights_only=True, period=5)
+    cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=CKPT_PATH, verbose=1, save_weights_only=True, period=10)
 
     optimizer = tf.keras.optimizers.Adam(learning_rate=LR)
 
@@ -96,7 +95,7 @@ def train():
                         steps_per_epoch=len(ytrain) // BATCH_SIZE,
                         validation_data=dataset_val,
                         callbacks=[tensorboard_cbk, cp_callback],
-                        class_weight=class_weight)
+                        class_weight={0:class_weights[0], 1:class_weights[1]})
 
     # Plot training & validation accuracy values
     plt.plot(history.history['BinaryAccuracy'])
@@ -105,7 +104,7 @@ def train():
     plt.ylabel('Accuracy')
     plt.xlabel('Epoch')
     plt.legend(['Train', 'Test'], loc='upper left')
-    plt.savefig(os.path.join(CKPT_PATH, 'accuracy.png'))
+    plt.savefig(os.path.join(CKPT_PATH, '../accuracy.png'))
     plt.show()
 
     # Plot training & validation loss values
@@ -115,7 +114,7 @@ def train():
     plt.ylabel('Loss')
     plt.xlabel('Epoch')
     plt.legend(['Train', 'Test'], loc='upper left')
-    plt.savefig(os.path.join(CKPT_PATH, 'loss.png'))
+    plt.savefig(os.path.join(CKPT_PATH, '../loss.png'))
     plt.show()
 
 def has_tomatoes(img_test, ckpt_path):
@@ -128,12 +127,14 @@ def has_tomatoes(img_test, ckpt_path):
     pred = model.predict(img_exp)
     pred = float(np.squeeze(pred))
     result = round(pred)
-    print('Img', img_test, 'contains tomato :', bool(result), '(', pred, ')')
+    print(f'Img {img_test} contains tomato : {bool(result)} ({pred})')
 
     plt.figure()
-    plt.title(bool(result))
+    plt.title(f'{bool(result)}  ({str(pred)})')
     plt.imshow(img)
     plt.show()
+
+    return bool(result)
 
 def evaluate(ckpt_path):
 
@@ -150,7 +151,7 @@ def evaluate(ckpt_path):
         pred = model.predict(img_exp)
         pred = float(np.squeeze(pred))
         result = round(pred)
-        print('Img', img_test, 'contains tomato :', bool(result), '(', pred, ') gt : ', bool(bin_dict[img_test]))
+        print(f'Img {img_test} contains tomato : {bool(result)} ({pred}) gt : {bool(bin_dict[img_test])}')
 
         if bin_dict[img_test] != bool(result):
             error_count += 1

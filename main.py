@@ -1,6 +1,3 @@
-#data augmentation
-#
-
 import argparse
 from config import *
 import os

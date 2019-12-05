@@ -3,7 +3,7 @@ import os
 import json
 import csv
 import tensorflow as tf
-from random import shuffle
+import random
 
 def search_in_csvFile(id, path):
 
@@ -57,7 +57,6 @@ def augment_img(img, label):
 
     img = tf.image.random_flip_left_right(img)
     img = tf.image.random_flip_up_down(img)
-
     rand = tf.random.uniform([])
     if rand > 0.5:
         img = tf.image.rot90(img, k=tf.random.uniform([], minval=1, maxval=4, dtype=tf.dtypes.int32))
@@ -74,14 +73,22 @@ def split_dataset(binary_dict, imgs_path):
     total_length = len(binary_dict)
     th = int(TRAIN_RATIO * total_length)
     full_set = []
-    #Create list of (img, bool) tuple
+    img_true = []
+
+    # Create list of (img, bool) tuple
     for img in binary_dict:
         full_set.append((os.path.join(imgs_path, img), binary_dict[img]))
+        if binary_dict[img]:
+            img_true.append((os.path.join(imgs_path, img), binary_dict[img]))
 
-    # shuffle(full_set)
+    if OVERSAMPLE:
+        n = len(full_set)//len(img_true)
+        dup = img_true * (n-1)
+        full_set = full_set + dup
+        random.shuffle(full_set)
+
     train_set = full_set[:th]
     val_set = full_set[th:]
-
     x_train, y_train = zip(*train_set)
     x_val, y_val = zip(*val_set)
 
