@@ -48,8 +48,7 @@ python main.py --eval
 [config.py](https://github.com/arimboux/Foodvisor_homeAssignment/blob/master/config.py) file (EVAL_IMGS).
 
 # Results
-[accuracy]: https://github.com/arimboux/Foodvisor_homeAssignment/blob/master/static/images/accuracy.png
-[loss]: https://github.com/arimboux/Foodvisor_homeAssignment/blob/master/static/images/loss.png
+![accuracy](static/images/accuracy.png) ![loss](static/images/loss.png)
 
 # Credits
 
