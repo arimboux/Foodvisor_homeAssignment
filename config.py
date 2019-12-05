@@ -2,16 +2,17 @@
 
 LABELS_PATH = r'D:\Foodvisor\dataset\label'
 IMGS_PATH = r'D:\Foodvisor\dataset\imgs\assignment_imgs'
-SAVEDIR_PATH = r'D:\Foodvisor\ckpt\14'
-LOG_PATH = r'D:\Foodvisor\logs\14'
+CKPT_PATH = r'D:\Foodvisor\ckpt\32\32'
+LOG_PATH = r'D:\Foodvisor\logs\32'
 
 
 ###TRAINING
 TOMATO_STR = ['Tomatoes', "Tomato", "Tomatoe", "Cherry tomatoes"]
 TRAIN_RATIO = 0.80
-EPOCHS = 60
+EPOCHS = 100
 BATCH_SIZE = 16
 LR = 10e-4
+IMG_SIZE = 600
 
 
 EVAL_IMGS = ['1dc879c960bbf936557a4162bd39df41.jpeg',

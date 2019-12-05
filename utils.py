@@ -3,6 +3,7 @@ import os
 import json
 import csv
 import tensorflow as tf
+from random import shuffle
 
 def search_in_csvFile(id, path):
 
@@ -47,11 +48,12 @@ def decode_img(img, label):
     img = tf.io.read_file(img)
     img = tf.image.decode_jpeg(img, channels=3)
     img = tf.image.convert_image_dtype(img, tf.float32)
-    img = tf.image.resize(img, [256, 256])
+    img = tf.image.resize(img, [IMG_SIZE, IMG_SIZE])
 
     return img, label
 
 def augment_img(img, label):
+    """Random image augmentation"""
 
     img = tf.image.random_flip_left_right(img)
     img = tf.image.random_flip_up_down(img)
@@ -76,7 +78,12 @@ def split_dataset(binary_dict, imgs_path):
     for img in binary_dict:
         full_set.append((os.path.join(imgs_path, img), binary_dict[img]))
 
+    # shuffle(full_set)
     train_set = full_set[:th]
     val_set = full_set[th:]
 
-    return train_set, val_set
+    x_train, y_train = zip(*train_set)
+    x_val, y_val = zip(*val_set)
+
+    return list(x_train), list(y_train), list(x_val), list(y_val)
+
